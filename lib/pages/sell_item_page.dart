@@ -17,11 +17,13 @@ class _SellItemPageState extends State<SellItemPage> {
   int _selectedMethod = 0; // 0: Fixed Price, 1: Auction
   File? _selectedImage;
   Uint8List? _webImageBytes;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
 
   void _onNavBarTap(int index) {
     if (index == 2) return; // Already on Sell Item
     Navigator.of(context).popUntil((route) => route.isFirst);
-    // Optionally, you can use a callback or navigation logic to go to the right tab
   }
 
   Future<void> _pickImage() async {
@@ -41,6 +43,60 @@ class _SellItemPageState extends State<SellItemPage> {
         });
       }
     }
+  }
+
+  void _submitItem() {
+    final name = _nameController.text.trim();
+    final description = _descriptionController.text.trim();
+    final price = _priceController.text.trim();
+    final hasImage = _selectedImage != null || _webImageBytes != null;
+
+    if (name.isEmpty || description.isEmpty || price.isEmpty || !hasImage) {
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Error'),
+              content: const Text(
+                'Please fill all fields and upload an image.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Confirm'),
+            content: const Text('Are you sure you want to submit this item?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Item submitted successfully!'),
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
+    );
   }
 
   @override
@@ -149,6 +205,7 @@ class _SellItemPageState extends State<SellItemPage> {
             ),
             const SizedBox(height: 8),
             TextField(
+              controller: _nameController,
               decoration: InputDecoration(
                 hintText: 'Enter item name',
                 filled: true,
@@ -165,6 +222,7 @@ class _SellItemPageState extends State<SellItemPage> {
             ),
             const SizedBox(height: 12),
             TextField(
+              controller: _descriptionController,
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: 'Enter item description',
@@ -235,6 +293,7 @@ class _SellItemPageState extends State<SellItemPage> {
             const SizedBox(height: 8),
             if (_selectedMethod == 0) // Fixed Price
               TextField(
+                controller: _priceController,
                 decoration: InputDecoration(
                   hintText: 'Set fixed price (if applicable)',
                   filled: true,
@@ -251,6 +310,7 @@ class _SellItemPageState extends State<SellItemPage> {
               ),
             if (_selectedMethod == 1) // Auction
               TextField(
+                controller: _priceController,
                 decoration: InputDecoration(
                   hintText: 'Starting bid price (if auction)',
                   filled: true,
@@ -265,6 +325,23 @@ class _SellItemPageState extends State<SellItemPage> {
                   ),
                 ),
               ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: _submitItem,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text('Submit'),
+              ),
+            ),
           ],
         ),
       ),
