@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   forui_assets: ^0.10.0
   forui: ^0.10.0+1
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +65,8 @@ flutter:
     - assets/images/Dozer.jpg
     - assets/images/Frontier.jpg
     - assets/images/Breaker.jpg
+    - assets/images/pfp.png
+    - assets/images/logo.gif
 
   # To add assets to your application, add an assets section, like this:
   # assets:
