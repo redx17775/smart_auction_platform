@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1040826331357",
+    "project_id": "smart-auction-platform",
+    "storage_bucket": "smart-auction-platform.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1040826331357:android:aa50911a013c89fdf26b34",
+        "android_client_info": {
+          "package_name": "com.example.smart_auction_platform"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9Jxdr8g5u0ar-fiiyR3ZR2c-yBYveA7w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
