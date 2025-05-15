@@ -37,6 +37,7 @@ dependencies:
   forui_assets: ^0.10.0
   forui: ^0.10.0+1
   image_picker: ^1.0.7
+  firebase_core: ^3.13.0
 
 dev_dependencies:
   flutter_test:
