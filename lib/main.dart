@@ -1,23 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'firebase_options.dart';
+import 'providers/auth_provider.dart';
+import 'pages/login_page.dart';
 import 'package:forui/forui.dart';
 import 'package:smart_auction_platform/pages/sell_item_page.dart';
 import 'package:smart_auction_platform/pages/auction_details_page.dart';
 import 'package:smart_auction_platform/pages/profile_page.dart';
-import 'package:smart_auction_platform/pages/login_page.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Auction App',
-      builder:
-          (context, child) => FTheme(data: FThemes.zinc.light, child: child!),
-      home: const LoginPage(),
-      debugShowCheckedModeBanner: false,
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      child: MaterialApp(
+        title: 'Smart Auction Platform',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: const LoginPage(),
+      ),
     );
   }
 }
