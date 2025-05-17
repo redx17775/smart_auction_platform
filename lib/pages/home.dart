@@ -19,21 +19,24 @@ class HomePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Active Auction', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            const Text('Active Auctions (GridView)', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _auctionCard(context, 'drill.jpg', 'Drill', '7 OMR'),
-                  _auctionCard(context, 'Dozer.jpg', 'Dozer', '6000 OMR'),
-                  _auctionCard(context, 'Frontier.jpg', 'Frontier', '52 OMR'),
-                  _auctionCard(context, 'Breaker.jpg', 'Breaker', '98 OMR'),
-                ],
-              ),
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.8,
+              children: [
+                _auctionCard(context, 'drill.jpg', 'Drill', '7 OMR'),
+                _auctionCard(context, 'Dozer.jpg', 'Dozer', '6000 OMR'),
+                _auctionCard(context, 'Frontier.jpg', 'Frontier', '52 OMR'),
+                _auctionCard(context, 'Breaker.jpg', 'Breaker', '98 OMR'),
+              ],
             ),
             const SizedBox(height: 32),
-            const Text('Current Auction', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            const Text('Current Auctions (ListView style)', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             _verticalCard(context, 'drill.jpg', 'Drill', '7 OMR'),
             _verticalCard(context, 'Frontier.jpg', 'Frontier', '52 OMR'),
@@ -45,7 +48,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _auctionCard(BuildContext context, String image, String title, String price) {
+  static Widget _auctionCard(BuildContext context, String image, String title, String price) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -61,8 +64,6 @@ class HomePage extends StatelessWidget {
         );
       },
       child: Container(
-        width: 280,
-        margin: const EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: Colors.grey[100],
@@ -74,13 +75,13 @@ class HomePage extends StatelessWidget {
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               child: Image.asset(
                 'assets/images/$image',
-                height: 150,
-                width: 280,
+                height: 100,
+                width: double.infinity,
                 fit: BoxFit.cover,
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -96,7 +97,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _verticalCard(BuildContext context, String image, String title, String price) {
+  static Widget _verticalCard(BuildContext context, String image, String title, String price) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -143,7 +144,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  String _getDescription(String title) {
+  static String _getDescription(String title) {
     switch (title) {
       case 'Drill':
         return 'A well-maintained used drill press for metalworking.';
