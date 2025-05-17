@@ -229,7 +229,7 @@ class _LoginPageState extends State<LoginPage> {
                                         strokeWidth: 2,
                                       ),
                                     )
-                                    : const Text('Sign In'),
+                                    : const Text('Log In'),
                           ),
                         ),
                         const SizedBox(height: 24),
