@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SellItemPage extends StatefulWidget {
   const SellItemPage({super.key});
@@ -83,14 +84,51 @@ class _SellItemPageState extends State<SellItemPage> {
                 child: const Text('Cancel'),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Item submitted successfully!'),
-                    ),
+                  final itemData = {
+                    'title': _nameController.text.trim(),
+                    'description': _descriptionController.text.trim(),
+                    'price': int.tryParse(_priceController.text.trim()) ?? 0,
+                    'image_path': _selectedImage?.path ?? '',
+                    'id': DateTime.now().millisecondsSinceEpoch,
+                  };
+                  final collection =
+                      _selectedMethod == 0 ? 'fixed_price' : 'auction';
+                  await FirebaseFirestore.instance
+                      .collection(collection)
+                      .add(itemData);
+
+                  showDialog(
+                    context: context,
+                    builder:
+                        (context) => AlertDialog(
+                          title: const Text('Item Submitted!'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Title: 	${itemData['title']}'),
+                              Text('Description: 	${itemData['description']}'),
+                              Text('Price: 	${itemData['price']}'),
+                              Text('Image Path: 	${itemData['image_path']}'),
+                              Text('ID: 	${itemData['id']}'),
+                              Text(
+                                'Type: 	${collection == 'fixed_price' ? 'Fixed Price' : 'Auction'}',
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close dialog
+                                Navigator.of(context).pop(); // Go back
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
                   );
-                  Navigator.of(context).pop();
                 },
                 child: const Text('Submit'),
               ),
