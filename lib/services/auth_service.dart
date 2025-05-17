@@ -16,10 +16,7 @@ class AuthService {
       .map(
         (snapshot) =>
             snapshot.docs
-                .map(
-                  (doc) =>
-                      UserModel.fromMap(doc.data() as Map<String, dynamic>),
-                )
+                .map((doc) => UserModel.fromMap(doc.data()))
                 .firstOrNull,
       );
 

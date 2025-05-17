@@ -8,12 +8,12 @@ class AuctionDetailsPage extends StatelessWidget {
   final String description;
 
   const AuctionDetailsPage({
-    Key? key,
+    super.key,
     required this.imagePath,
     required this.title,
     required this.currentBid,
     required this.description,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

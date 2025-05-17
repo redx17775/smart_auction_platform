@@ -5,7 +5,7 @@ import 'package:smart_auction_platform/main.dart';
 import '../models/user.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -30,8 +30,15 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     User? foundUser = users.firstWhere(
-          (user) => user.username == username,
-      orElse: () => User(username: '', password: '', phone: '', email: '', accountType: ''),
+      (user) => user.username == username,
+      orElse:
+          () => User(
+            username: '',
+            password: '',
+            phone: '',
+            email: '',
+            accountType: '',
+          ),
     );
 
     if (foundUser.username == '') {
@@ -59,9 +66,7 @@ class _LoginPageState extends State<LoginPage> {
       Future.delayed(const Duration(milliseconds: 500), () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => Application(loggedInUser: foundUser),
-          ),
+          MaterialPageRoute(builder: (_) => const Application()),
         );
       });
     }
@@ -71,46 +76,54 @@ class _LoginPageState extends State<LoginPage> {
     final TextEditingController phoneController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Enter phone number'),
-        content: TextField(
-          controller: phoneController,
-          decoration: const InputDecoration(
-            hintText: 'Enter your phone number',
-          ),
-          keyboardType: TextInputType.phone,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              String phone = phoneController.text.trim();
-              User? foundUser = users.firstWhere(
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Enter phone number'),
+            content: TextField(
+              controller: phoneController,
+              decoration: const InputDecoration(
+                hintText: 'Enter your phone number',
+              ),
+              keyboardType: TextInputType.phone,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  String phone = phoneController.text.trim();
+                  User? foundUser = users.firstWhere(
                     (user) => user.phone == phone,
-                orElse: () => User(username: '', password: '', phone: '', email: '', accountType: ''),
-              );
+                    orElse:
+                        () => User(
+                          username: '',
+                          password: '',
+                          phone: '',
+                          email: '',
+                          accountType: '',
+                        ),
+                  );
 
-              Navigator.pop(context);
+                  Navigator.pop(context);
 
-              if (foundUser.username == '') {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Incorrect Phone Number'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Check the link in your Message'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              }
-            },
-            child: const Text('Submit'),
+                  if (foundUser.username == '') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Incorrect Phone Number'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Check the link in your Message'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Submit'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -185,7 +198,9 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const SignUpPage()),
+                            MaterialPageRoute(
+                              builder: (context) => const SignUpPage(),
+                            ),
                           );
                         },
                         child: const Text('Sign Up'),

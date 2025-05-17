@@ -5,7 +5,7 @@ import '../providers/auth_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -87,7 +87,8 @@ class _LoginPageState extends State<LoginPage> {
       final firestore = FirebaseFirestore.instance;
       final result = await firestore.collection('users').limit(1).get();
       print(
-          'Firestore connection test - Documents found: ${result.docs.length}');
+        'Firestore connection test - Documents found: ${result.docs.length}',
+      );
       if (result.docs.isNotEmpty) {
         print('Sample document data: ${result.docs.first.data()}');
       }
@@ -151,8 +152,9 @@ class _LoginPageState extends State<LoginPage> {
                             filled: true,
                             fillColor: Color(0xFFF3F4F6),
                             border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
                               borderSide: BorderSide.none,
                             ),
                             contentPadding: EdgeInsets.symmetric(
@@ -172,8 +174,9 @@ class _LoginPageState extends State<LoginPage> {
                             filled: true,
                             fillColor: const Color(0xFFF3F4F6),
                             border: const OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
                               borderSide: BorderSide.none,
                             ),
                             contentPadding: const EdgeInsets.symmetric(
@@ -186,9 +189,10 @@ class _LoginPageState extends State<LoginPage> {
                                     ? Icons.visibility_off
                                     : Icons.visibility,
                               ),
-                              onPressed: () => setState(
-                                () => _obscurePassword = !_obscurePassword,
-                              ),
+                              onPressed:
+                                  () => setState(
+                                    () => _obscurePassword = !_obscurePassword,
+                                  ),
                             ),
                           ),
                           enabled: !authProvider.isLoading,
@@ -215,16 +219,17 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               elevation: 0,
                             ),
-                            child: authProvider.isLoading
-                                ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Text('Sign In'),
+                            child:
+                                authProvider.isLoading
+                                    ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                    : const Text('Sign In'),
                           ),
                         ),
                         const SizedBox(height: 24),

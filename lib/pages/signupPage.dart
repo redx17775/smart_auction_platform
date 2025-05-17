@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/user.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key}) : super(key: key);
+  const SignUpPage({super.key});
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -40,16 +40,19 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void _signUp() {
     if (_formKey.currentState!.validate()) {
-      users.add(User(
-        username: _usernameController.text.trim(),
-        password: _passwordController.text.trim(),
-        phone: _phoneController.text.trim(),
-        email: _emailController.text.trim(),
-        address: _addressController.text.trim().isEmpty
-            ? null
-            : _addressController.text.trim(),
-        accountType: accountType,
-      ));
+      users.add(
+        User(
+          username: _usernameController.text.trim(),
+          password: _passwordController.text.trim(),
+          phone: _phoneController.text.trim(),
+          email: _emailController.text.trim(),
+          address:
+              _addressController.text.trim().isEmpty
+                  ? null
+                  : _addressController.text.trim(),
+          accountType: accountType,
+        ),
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Signup Successful!'),
@@ -139,12 +142,15 @@ class _SignUpPageState extends State<SignUpPage> {
                             accountType = value!;
                           });
                         },
-                        items: ['Buyer', 'Seller']
-                            .map((type) => DropdownMenuItem(
-                          value: type,
-                          child: Text(type),
-                        ))
-                            .toList(),
+                        items:
+                            ['Buyer', 'Seller']
+                                .map(
+                                  (type) => DropdownMenuItem(
+                                    value: type,
+                                    child: Text(type),
+                                  ),
+                                )
+                                .toList(),
                       ),
                     ],
                   ),

@@ -6,14 +6,14 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
 class SellItemPage extends StatefulWidget {
-  const SellItemPage({Key? key}) : super(key: key);
+  const SellItemPage({super.key});
 
   @override
   State<SellItemPage> createState() => _SellItemPageState();
 }
 
 class _SellItemPageState extends State<SellItemPage> {
-  int _selectedIndex = 2;
+  final int _selectedIndex = 2;
   int _selectedMethod = 0; // 0: Fixed Price, 1: Auction
   File? _selectedImage;
   Uint8List? _webImageBytes;

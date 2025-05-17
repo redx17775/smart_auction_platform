@@ -3,7 +3,7 @@ import 'package:smart_auction_platform/models/user.dart';
 
 class ProfilePage extends StatelessWidget {
   final User user;
-  const ProfilePage({Key? key, required this.user}) : super(key: key);
+  const ProfilePage({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +51,7 @@ class ProfilePage extends StatelessWidget {
             style: const TextStyle(fontSize: 18, color: Colors.grey),
           ),
           const SizedBox(height: 16),
-          Text(
-            phoneDisplay,
-            style: const TextStyle(fontSize: 18),
-          ),
+          Text(phoneDisplay, style: const TextStyle(fontSize: 18)),
           const SizedBox(height: 32),
           ElevatedButton.icon(
             onPressed: () {
@@ -66,7 +63,9 @@ class ProfilePage extends StatelessWidget {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
         ],

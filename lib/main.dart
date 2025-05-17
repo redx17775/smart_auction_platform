@@ -8,6 +8,7 @@ import 'package:forui/forui.dart';
 import 'package:smart_auction_platform/pages/sell_item_page.dart';
 import 'package:smart_auction_platform/pages/auction_details_page.dart';
 import 'package:smart_auction_platform/pages/profile_page.dart';
+import 'package:smart_auction_platform/models/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +17,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +51,18 @@ class _ApplicationState extends State<Application> {
     BrowsePage(),
     // The third tab is Sell Item, which opens as a modal, so we use a placeholder
     Container(),
-    ProfilePage(),
+    Consumer<AuthProvider>(
+      builder:
+          (context, auth, _) => ProfilePage(
+            user: User(
+              username: auth.user?.name ?? '',
+              password: auth.user?.password ?? '',
+              phone: auth.user?.phoneNumber ?? '',
+              email: auth.user?.email ?? '',
+              accountType: 'User',
+            ),
+          ),
+    ),
   ];
 
   @override
@@ -94,6 +106,8 @@ class _ApplicationState extends State<Application> {
 }
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -369,6 +383,8 @@ class BrowsePage extends StatelessWidget {
     },
   ];
 
+  const BrowsePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -469,6 +485,8 @@ class BrowsePage extends StatelessWidget {
 }
 
 class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Center(child: Text('Search Page'));
