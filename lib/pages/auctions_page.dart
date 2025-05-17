@@ -4,69 +4,50 @@ import 'package:smart_auction_platform/pages/auction_details_page.dart';
 class AuctionsPage extends StatelessWidget {
   const AuctionsPage({super.key});
 
-  // Reusing the auction items from home.dart
-  final List<Map<String, String>> auctionItems = const [
-    {'image': 'drill.jpg', 'title': 'Drill', 'price': '7 OMR'},
-    {'image': 'Dozer.jpg', 'title': 'Dozer', 'price': '6000 OMR'},
-    {'image': 'Frontier.jpg', 'title': 'Frontier', 'price': '52 OMR'},
-    {'image': 'Breaker.jpg', 'title': 'Breaker', 'price': '98 OMR'},
+  // Sample auction data
+  final List<Map<String, String>> activeAuctions = const [
+    {'image': 'drill.jpg', 'title': 'Used Drill Press', 'price': '500 OMR', 'myBid': '480 OMR'},
+    {'image': 'Dozer.jpg', 'title': 'Bulldozer', 'price': '6000 OMR', 'myBid': '5500 OMR'},
+  ];
+
+  final List<Map<String, String>> endedAuctions = const [
+    {'image': 'Frontier.jpg', 'title': 'Frontier Tool', 'price': '52 OMR', 'myBid': '50 OMR'},
+  ];
+
+  final List<Map<String, String>> myBids = const [
+    {'image': 'drill.jpg', 'title': 'Used Drill Press', 'price': '500 OMR', 'myBid': '480 OMR'},
+    {'image': 'Dozer.jpg', 'title': 'Bulldozer', 'price': '6000 OMR', 'myBid': '5500 OMR'},
+    {'image': 'Frontier.jpg', 'title': 'Frontier Tool', 'price': '52 OMR', 'myBid': '50 OMR'},
   ];
 
   String _getDescription(String title) {
     switch (title) {
-      case 'Drill':
+      case 'Used Drill Press':
         return 'A well-maintained used drill press for metalworking.';
-      case 'Dozer':
+      case 'Bulldozer':
         return 'Heavy-duty bulldozer for construction and earthmoving.';
-      case 'Frontier':
+      case 'Frontier Tool':
         return 'Reliable tool for various frontier tasks.';
-      case 'Breaker':
-        return 'Powerful breaker machine for demolition.';
       default:
         return 'Auction item description.';
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Auctions'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Active'),
-              Tab(text: 'Ended'),
-              Tab(text: 'My Bids'),
-            ],
-          ),
+  Widget _buildAuctionGrid(List<Map<String, String>> items) {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.75,
         ),
-        body: TabBarView(
-          children: [
-            // Active Auctions Grid
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.75,
-                ),
-                itemCount: auctionItems.length,
-                itemBuilder: (context, index) {
-                  final item = auctionItems[index];
-                  return _auctionGridItem(context, item);
-                },
-              ),
-            ),
-            // Ended Auctions (same grid but could filter different items)
-            const Center(child: Text('Ended Auctions')),
-            // My Bids
-            const Center(child: Text('My Bids')),
-          ],
-        ),
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return _auctionGridItem(context, item);
+        },
       ),
     );
   }
@@ -97,8 +78,7 @@ class AuctionsPage extends StatelessWidget {
             Expanded(
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
-                ),
+                    top: Radius.circular(12)),
                 child: Image.asset(
                   'assets/images/${item['image']}',
                   width: double.infinity,
@@ -114,20 +94,52 @@ class AuctionsPage extends StatelessWidget {
                   Text(
                     item['title']!,
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
                   ),
+                  const SizedBox(height: 4),
                   Text(
-                    item['price']!,
+                    'Current: ${item['price']}',
                     style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                    ),
+                        color: Colors.grey,
+                        fontSize: 14),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'My Bid: ${item['myBid']}',
+                    style: const TextStyle(
+                        color: Colors.blue,
+                        fontSize: 14),
                   ),
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('My Auctions'),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'Active'),
+              Tab(text: 'Ended'),
+              Tab(text: 'My Bids'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            _buildAuctionGrid(activeAuctions),
+            _buildAuctionGrid(endedAuctions),
+            _buildAuctionGrid(myBids),
           ],
         ),
       ),
