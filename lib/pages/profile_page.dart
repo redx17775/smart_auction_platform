@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:smart_auction_platform/models/user.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class ProfilePage extends StatelessWidget {
-  final User user;
-  const ProfilePage({super.key, required this.user});
+  const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final String phoneDisplay = '+968 ${user.phone}';
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.user;
+
+    if (user == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final String phoneDisplay =
+        user.phoneNumber != null && user.phoneNumber!.isNotEmpty
+            ? '+968 ${user.phoneNumber}'
+            : 'No phone';
 
     return Scaffold(
       appBar: AppBar(
@@ -42,12 +52,12 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 50), // to clear avatar space
           Text(
-            user.username,
+            user.name ?? 'No Name',
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            user.accountType,
+            user.email,
             style: const TextStyle(fontSize: 18, color: Colors.grey),
           ),
           const SizedBox(height: 16),

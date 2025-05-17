@@ -9,6 +9,7 @@ import 'package:smart_auction_platform/pages/sell_item_page.dart';
 import 'package:smart_auction_platform/pages/auction_details_page.dart';
 import 'package:smart_auction_platform/pages/profile_page.dart';
 import 'package:smart_auction_platform/models/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,21 +49,10 @@ class _ApplicationState extends State<Application> {
   // Define pages for each tab (must match the nav bar)
   final List<Widget> _pages = [
     HomePage(),
-    BrowsePage(),
+    SearchPage(),
     // The third tab is Sell Item, which opens as a modal, so we use a placeholder
     Container(),
-    Consumer<AuthProvider>(
-      builder:
-          (context, auth, _) => ProfilePage(
-            user: User(
-              username: auth.user?.name ?? '',
-              password: auth.user?.password ?? '',
-              phone: auth.user?.phoneNumber ?? '',
-              email: auth.user?.email ?? '',
-              accountType: 'User',
-            ),
-          ),
-    ),
+    ProfilePage(),
   ];
 
   @override
@@ -360,135 +350,544 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class BrowsePage extends StatelessWidget {
-  // Mock data for auctions the user is part of
-  final List<Map<String, String>> myAuctions = const [
-    {
-      'image': 'assets/images/drill.jpg',
-      'name': 'Used Drill Press',
-      'myBid': 'OMR 480',
-      'currentBid': 'OMR 500',
-    },
-    {
-      'image': 'assets/images/Dozer.jpg',
-      'name': 'Bulldozer',
-      'myBid': 'OMR 5500',
-      'currentBid': 'OMR 6000',
-    },
-    {
-      'image': 'assets/images/Frontier.jpg',
-      'name': 'Frontier Tool',
-      'myBid': 'OMR 50',
-      'currentBid': 'OMR 52',
-    },
-  ];
+class SearchPage extends StatefulWidget {
+  const SearchPage({super.key});
 
-  const BrowsePage({super.key});
+  @override
+  State<SearchPage> createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+  bool isAuction = true; // true for auction, false for fixed price
+  final TextEditingController _searchController = TextEditingController();
+  String searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Auctions'),
+        title: const Text('Search'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
       ),
       backgroundColor: Colors.white,
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: myAuctions.length,
-        itemBuilder: (context, index) {
-          final auction = myAuctions[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder:
-                      (context) => AuctionDetailsPage(
-                        imagePath: auction['image']!,
-                        title: auction['name']!,
-                        currentBid: auction['currentBid']!,
-                        description: _getDescriptionForItem(auction['name']!),
-                      ),
-                ),
-              );
-            },
-            child: Card(
-              color: Colors.grey[200],
-              margin: const EdgeInsets.only(bottom: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.asset(
-                        auction['image']!,
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            auction['name']!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // Toggle between Auction and Fixed Price
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => isAuction = true),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color:
+                                  isAuction ? Colors.blue : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Auctions',
+                                style: TextStyle(
+                                  color:
+                                      isAuction ? Colors.white : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'My Bid: ${auction['myBid']}',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          Text(
-                            'Current Bid: ${auction['currentBid']}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => isAuction = false),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color:
+                                  !isAuction ? Colors.blue : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Fixed Price',
+                                style: TextStyle(
+                                  color:
+                                      !isAuction ? Colors.white : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 16),
+                // Search Bar only
+                TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value.toLowerCase();
+                    });
+                  },
+                  decoration: InputDecoration(
+                    hintText:
+                        isAuction
+                            ? 'Search auctions...'
+                            : 'Search fixed price items...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                  ),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+          Expanded(
+            child:
+                isAuction
+                    ? StreamBuilder<QuerySnapshot>(
+                      stream:
+                          FirebaseFirestore.instance
+                              .collection('auction')
+                              .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return const Center(
+                            child: Text('Something went wrong'),
+                          );
+                        }
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Center(child: Text('No auctions found'));
+                        }
+                        // Client-side filtering
+                        final docs =
+                            searchQuery.isEmpty
+                                ? snapshot.data!.docs
+                                : snapshot.data!.docs.where((doc) {
+                                  final data =
+                                      doc.data() as Map<String, dynamic>;
+                                  final title =
+                                      (data['title'] ?? '')
+                                          .toString()
+                                          .toLowerCase();
+                                  return title.contains(searchQuery);
+                                }).toList();
+                        if (docs.isEmpty) {
+                          return const Center(child: Text('No auctions found'));
+                        }
+                        return ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: docs.length,
+                          itemBuilder: (context, index) {
+                            final doc = docs[index];
+                            final data = doc.data() as Map<String, dynamic>;
+                            final imageUrl =
+                                (data['image_path'] ?? '').toString().isNotEmpty
+                                    ? data['image_path']
+                                    : 'https://via.placeholder.com/80';
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => DynamicDetailsPage(
+                                          docId: doc.id,
+                                          collection: 'auction',
+                                          data: data,
+                                        ),
+                                  ),
+                                );
+                              },
+                              child: Card(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                color: Colors.grey[100],
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          imageUrl,
+                                          width: 80,
+                                          height: 80,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) {
+                                            return Container(
+                                              width: 80,
+                                              height: 80,
+                                              color: Colors.grey[300],
+                                              child: const Icon(Icons.error),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              data['title'] ?? 'Untitled',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Price: OMR ${data['price'] ?? '0'}',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            if (data['description'] != null)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  top: 4.0,
+                                                ),
+                                                child: Text(
+                                                  data['description'],
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black54,
+                                                  ),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    )
+                    : StreamBuilder<QuerySnapshot>(
+                      stream:
+                          FirebaseFirestore.instance
+                              .collection('fixed_price')
+                              .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return const Center(
+                            child: Text('Something went wrong'),
+                          );
+                        }
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Center(child: Text('No items found'));
+                        }
+                        // Client-side filtering
+                        final docs =
+                            searchQuery.isEmpty
+                                ? snapshot.data!.docs
+                                : snapshot.data!.docs.where((doc) {
+                                  final data =
+                                      doc.data() as Map<String, dynamic>;
+                                  final title =
+                                      (data['title'] ?? '')
+                                          .toString()
+                                          .toLowerCase();
+                                  return title.contains(searchQuery);
+                                }).toList();
+                        if (docs.isEmpty) {
+                          return const Center(child: Text('No items found'));
+                        }
+                        return ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: docs.length,
+                          itemBuilder: (context, index) {
+                            final doc = docs[index];
+                            final data = doc.data() as Map<String, dynamic>;
+                            final imageUrl =
+                                (data['image_path'] ?? '').toString().isNotEmpty
+                                    ? data['image_path']
+                                    : 'https://via.placeholder.com/80';
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => DynamicDetailsPage(
+                                          docId: doc.id,
+                                          collection: 'fixed_price',
+                                          data: data,
+                                        ),
+                                  ),
+                                );
+                              },
+                              child: Card(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                color: Colors.grey[100],
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          imageUrl,
+                                          width: 80,
+                                          height: 80,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) {
+                                            return Container(
+                                              width: 80,
+                                              height: 80,
+                                              color: Colors.grey[300],
+                                              child: const Icon(Icons.error),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              data['title'] ?? 'Untitled',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Price: OMR ${data['price'] ?? '0'}',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            if (data['description'] != null)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  top: 4.0,
+                                                ),
+                                                child: Text(
+                                                  data['description'],
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black54,
+                                                  ),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+          ),
+        ],
       ),
     );
   }
-
-  String _getDescriptionForItem(String name) {
-    switch (name) {
-      case 'Used Drill Press':
-        return 'A well-maintained used drill press for metalworking with all original parts.';
-      case 'Bulldozer':
-        return 'Heavy-duty bulldozer suitable for construction and earthmoving.';
-      case 'Frontier Tool':
-        return 'Reliable tool for various frontier tasks and repairs.';
-      default:
-        return 'Powerful breaker machine for demolition and construction.';
-    }
-  }
 }
 
-class SearchPage extends StatelessWidget {
-  const SearchPage({super.key});
+// Dynamic Details Page
+class DynamicDetailsPage extends StatelessWidget {
+  final String docId;
+  final String collection;
+  final Map<String, dynamic> data;
+
+  const DynamicDetailsPage({
+    super.key,
+    required this.docId,
+    required this.collection,
+    required this.data,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Search Page'));
+    final imageUrl =
+        (data['image_path'] ?? '').toString().isNotEmpty
+            ? data['image_path']
+            : 'https://via.placeholder.com/400x200';
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Auction Details'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(0),
+                topRight: Radius.circular(0),
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16),
+              ),
+              child: Image.network(
+                imageUrl,
+                width: double.infinity,
+                height: 180,
+                fit: BoxFit.cover,
+                errorBuilder:
+                    (context, error, stackTrace) => Container(
+                      width: double.infinity,
+                      height: 180,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.error, size: 40),
+                    ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    data['title'] ?? 'Untitled',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Price: OMR ${data['price'] ?? '0'}',
+                    style: const TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Item Description',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(data['description'] ?? 'No description'),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(48),
+                    ),
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder:
+                            (context) => AlertDialog(
+                              title: const Text('Delete Item'),
+                              content: const Text(
+                                'Are you sure you want to delete this item?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed:
+                                      () => Navigator.of(context).pop(false),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed:
+                                      () => Navigator.of(context).pop(true),
+                                  child: const Text(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                      );
+                      if (confirm == true) {
+                        await FirebaseFirestore.instance
+                            .collection(collection)
+                            .doc(docId)
+                            .delete();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Item deleted successfully.'),
+                            ),
+                          );
+                          Navigator.of(context).pop();
+                        }
+                      }
+                    },
+                    child: const Text('Delete Item'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
